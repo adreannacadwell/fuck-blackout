@@ -1,1 +1,29 @@
+name: "🤗 聊天机器人"
 
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+  models: read
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      # ========== Get Prompt ==========
+      - name: 😊 Generate
+        id: inference
+        uses: actions/ai-inference@v1
+        with:
+          prompt: "${{ github.event.comment.body }}"
+      
+      # ========== Comment Response ==========
+      - name: 🖋 Write response
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: ${{ steps.inference.outputs.response }}
